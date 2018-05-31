@@ -6,7 +6,7 @@
 #include <string> //For string
 #include <utility> //For integer_sequence
 
-#define metastring(str) string_converter<sizeof(str),0,str>::type
+
 
 using std::integer_sequence;
 using std::string;
@@ -23,12 +23,15 @@ template<char... chars> struct meta_string{
 };
 
 namespace detail{
-  template<size_t N,size_t I = 0,char string[N],char... chars> struct string_converter: string_converter<N,I+1,string,chars...,string[I]>{};
-  template<size_t N,char string[N],char... chars>  struct string_converter<N,N-1,string,chars...>{
-    typedef meta_string<chars...> type;
-  };
+  template<size_t N,size_t... Indecies> constexpr decltype(auto) parseStringHelper(char (&chr)[N],std::integral_sequence<Idecies...>){
+    return meta_string<chr[Indecies]...>();
+  }
+  template<size_t N> constexpr decltype(auto) parseString(char (&chr)[N]){
+    parseStringHelper(chr,std::make_integer_sequence<N>());
+  }
 };
 
+#define metastr(str) decltype((detail::parseString(#str)))
 
 
 using std::integral_constant;
