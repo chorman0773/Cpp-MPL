@@ -23,15 +23,15 @@ template<char... chars> struct meta_string{
 };
 
 namespace detail{
-  template<size_t N,size_t... Indecies> constexpr decltype(auto) parseStringHelper(char (&chr)[N],std::integral_sequence<Idecies...>){
+  template<size_t N,size_t... Indecies> constexpr decltype(auto) parseStringHelper(const char (&chr)[N],std::integral_sequence<Idecies...>){
     return meta_string<chr[Indecies]...>();
   }
-  template<size_t N> constexpr decltype(auto) parseString(char (&chr)[N]){
+  template<size_t N> constexpr decltype(auto) parseString(const char (&chr)[N]){
     parseStringHelper(chr,std::make_integer_sequence<N>());
   }
 };
 
-#define metastr(str) decltype((detail::parseString(#str)))
+#define str(str) decltype((detail::parseString(#str)))
 
 
 using std::integral_constant;
@@ -42,12 +42,45 @@ template<int i> struct meta_int:integral_constant<int,i>{};
 template<size_t s> struct meta_size:integral_constant<size_t,s>{};
 
 template<long long l> struct meta_long:integral_constant<long long,l>{};
-template<unsigned long long ul> struct meta_long:integral_constant<unsigned long long,ul>{};
 
 template<bool> struct meta_boolean:false_type{};
 template<> struct meta_boolean<true>:true_type{};
 
 
+template<typename a,typename b> struct add;
 
+template<int a,int b> struct add<meta_int<a>,meta_int<b>>:meta_int<a+b>{};
+template<size_t a,size_t b> struct add<meta_size<a>,meta_size<b>>:meta_size<a+b>{};
+template<int a,size_t b> struct add<meta_int<a>,meta_size<b>>:meta_size<a+b>{};
+template<size_t a,int b> struct add<meta_size<a>,meta_int<b>>:meta_size<a+b>{};
+template<long long a,long long b> struct add<meta_long<a>,meta_long<b>>:meta_long<a+b>{};
+template<int a,long long b> struct add<meta_int<a>,meta_long<b>>:meta_long<a+b>{};
+template<long long a,int b> struct add<meta_long<a>,meta_int<b>>:meta_long<a+b>{};
+template<long long a,size_t b> struct add<meta_long<a>,meta_size<b>>:meta_long<a+b>{};
+template<size_t a,long long b> struct add<meta_size<a>,meta_long<b>>:meta_long<a+b>{};
+
+template<typename a,typename b> struct sub;
+
+template<int a,int b> struct sub<meta_int<a>,meta_int<b>>:meta_int<a-b>{};
+template<size_t a,size_t b> struct sub<meta_size<a>,meta_size<b>>:meta_size<a-b>{};
+template<int a,size_t b> struct sub<meta_int<a>,meta_size<b>>:meta_size<a-b>{};
+template<size_t a,int b> struct sub<meta_size<a>,meta_int<b>>:meta_size<a-b>{};
+template<long long a,long long b> struct sub<meta_long<a>,meta_long<b>>:meta_long<a-b>{};
+template<int a,long long b> struct sub<meta_int<a>,meta_long<b>>:meta_long<a-b>{};
+template<long long a,int b> struct sub<meta_long<a>,meta_int<b>>:meta_long<a-b>{};
+template<long long a,size_t b> struct sub<meta_long<a>,meta_size<b>>:meta_long<a-b>{};
+template<size_t a,long long b> struct sub<meta_size<a>,meta_long<b>>:meta_long<a-b>{};
+
+template<typename a,typename b> struct mul;
+
+template<int a,int b> struct mul<meta_int<a>,meta_int<b>>:meta_int<a*b>{};
+template<size_t a,size_t b> struct mul<meta_size<a>,meta_size<b>>:meta_size<a*b>{};
+template<int a,size_t b> struct mul<meta_int<a>,meta_size<b>>:meta_size<a*b>{};
+template<size_t a,int b> struct mul<meta_size<a>,meta_int<b>>:meta_size<a*b>{};
+template<long long a,long long b> struct mul<meta_long<a>,meta_long<b>>:meta_long<a*b>{};
+template<int a,long long b> struct mul<meta_int<a>,meta_long<b>>:meta_long<a*b>{};
+template<long long a,int b> struct mul<meta_long<a>,meta_int<b>>:meta_long<a*b>{};
+template<long long a,size_t b> struct mul<meta_long<a>,meta_size<b>>:meta_long<a*b>{};
+template<size_t a,long long b> struct mul<meta_size<a>,meta_long<b>>:meta_long<a*b>{};
 
 #endif
